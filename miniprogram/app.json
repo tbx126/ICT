@@ -4,9 +4,7 @@
         "pages/Helper/Helper",
         "pages/Home/Home",
         "pages/Recommend/Recommend",
-        "pages/My/My",
-        "pages/light/index",
-        "pages/dark/index"
+        "pages/My/My"
         
     ],
     "window": {

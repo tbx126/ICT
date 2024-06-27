@@ -32,6 +32,7 @@
     position: relative;
     word-wrap: break-word;
     box-sizing: border-box;
+    max-width: 80%; /* 限制气泡最大宽度 */
 }
 
 .sender {
@@ -92,4 +93,25 @@
 .receiver towxml .h2w__p {
     margin-top: 0.3em;
     margin-bottom: 0.3em;
+}
+
+@keyframes blink {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+.waiting-dots {
+    animation: blink 1.4s infinite both;
+}
+
+/* 新增样式 */
+.chat-bubble.receiver .waiting-dots {
+    font-size: 20px;
+    letter-spacing: 3px;
+}
+
+.chat-bubble.receiver image {
+    max-width: 100%;
+    height: auto;
 }

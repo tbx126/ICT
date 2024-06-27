@@ -16,6 +16,12 @@
         </block>
       </view>
     </block>
+    <view wx:if="{{isWaiting}}" class="chat-bubble receiver">
+      <text class="waiting-dots">.....</text>
+    </view>
+    <view wx:if="{{isWaitingImage}}" class="chat-bubble receiver">
+      <image src="../../images/loading.gif" mode="widthFix" style="max-width: 50px; margin-top: 10px;" />
+    </view>
     <view id="bottom"></view>
   </scroll-view>
   

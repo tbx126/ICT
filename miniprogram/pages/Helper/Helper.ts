@@ -8,7 +8,9 @@ Page({
         inputValue: '',
         scrollToView: '',
         cid: '',
-        imagePath: ''
+        imagePath: '',
+        isWaiting: false,
+        isWaitingImage: false
     },
 
     onLoad: function() {
@@ -44,6 +46,7 @@ Page({
         this.setData({
             messages: this.data.messages.concat([newMessage]),
             inputValue: '',
+            isWaiting: true
         }, () => {
             this.scrollToBottom();
         });
@@ -65,13 +68,17 @@ Page({
                     
                     this.setData({
                         messages: this.data.messages.concat(newMessages),
-                        cid: res.data.cid
+                        cid: res.data.cid,
+                        isWaiting: false
                     }, () => {
                         this.scrollToBottom();
                     });
 
                     // Add image message if there's an image
                     if (res.data.has_image && res.data.image_description) {
+                        this.setData({
+                            isWaitingImage: true
+                        });
                         wx.request({
                             url: 'http://localhost:7799/generate_image',
                             method: 'POST',
@@ -85,6 +92,7 @@ Page({
                                     };
                                     this.setData({
                                         messages: this.data.messages.concat([imageMessage]),
+                                        isWaitingImage: false
                                     }, () => {
                                         this.scrollToBottom();
                                     });
@@ -92,6 +100,7 @@ Page({
                                     const errorMessage = { isSender: false, message: '图片生成失败', type: 'text' };
                                     this.setData({
                                         messages: this.data.messages.concat([errorMessage]),
+                                        isWaitingImage: false
                                     }, () => {
                                         this.scrollToBottom();
                                     });
@@ -106,6 +115,7 @@ Page({
                                 const errorMessage = { isSender: false, message: '图片生成请求失败，请重试', type: 'text' };
                                 this.setData({
                                     messages: this.data.messages.concat([errorMessage]),
+                                    isWaitingImage: false
                                 }, () => {
                                     this.scrollToBottom();
                                 });
@@ -116,6 +126,7 @@ Page({
                     const errorMessage = { isSender: false, message: '服务器返回错误', type: 'text' };
                     this.setData({
                         messages: this.data.messages.concat([errorMessage]),
+                        isWaiting: false
                     }, () => {
                         this.scrollToBottom();
                     });
@@ -130,6 +141,7 @@ Page({
                 const errorMessage = { isSender: false, message: '请求失败，请重试', type: 'text' };
                 this.setData({
                     messages: this.data.messages.concat([errorMessage]),
+                    isWaiting: false
                 }, () => {
                     this.scrollToBottom();
                 });
