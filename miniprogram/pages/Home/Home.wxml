@@ -1,0 +1,28 @@
+<swiper class="swiper-container" indicator-dots indicator-color="white" indicator-active-color="black" autoplay circular="3000">
+    <!-- 轮播图项 -->
+    <swiper-item>
+       <image src="../../images/1.png" mode="aspectFit"/>
+    </swiper-item>
+    <swiper-item>
+        <image src="../../images/2.png" mode="aspectFit"/>
+    </swiper-item>
+    <swiper-item>
+        <image src="../../images/3.png" mode="aspectFit"/>
+    </swiper-item>
+</swiper>
+
+<view class="button-container">
+    <!-- 功能按钮 -->
+    <navigator url="/pages/awareness/awareness" hover-class="navigator-hover">
+        <button>阿尔兹海默症科普</button>
+    </navigator>
+    <navigator url="/pages/care_tips/care_tips" hover-class="navigator-hover">
+        <button>护理建议</button>
+    </navigator>
+    <navigator url="/pages/support_group/support_group" hover-class="navigator-hover">
+        <button>患者家属互助圈</button>
+    </navigator>
+    <navigator url="/pages/research/research" hover-class="navigator-hover">
+        <button>最新研究与进展</button>
+    </navigator>
+</view>

@@ -1,0 +1,36 @@
+<view class="container">
+  <scroll-view
+    class="chat-container"
+    scroll-y
+    scroll-into-view="{{scrollToView}}"
+    scroll-with-animation
+    style="height: calc(100% - 60px);"
+  >
+    <block wx:for="{{messages}}" wx:key="index">
+      <view class="chat-bubble {{item.isSender ? 'sender' : 'receiver'}}" id="msg{{index}}">
+        <block wx:if="{{item.type === 'text'}}">
+          <text>{{item.message}}</text>
+        </block>
+        <block wx:elif="{{item.type === 'image'}}">
+          <image src="{{item.isSender ? imagePath : item.imgUrl}}" mode="widthFix" style="max-width: 200px; margin-top: 10px;" />
+        </block>
+      </view>
+    </block>
+    <view id="bottom"></view>
+  </scroll-view>
+  
+  <view class="input-container">
+    <input
+      class="input"
+      value="{{inputValue}}"
+      bindinput="onInput"
+      placeholder="输入消息内容"
+    />
+    <button class="send-btn" bindtap="onSend">
+      <image src="../../images/send.png" style="width: 20px; height: 20px;" />
+    </button>
+    <button class="send-btn" bindtap="chooseImage">
+      <image src="../../images/files.png" style="width: 20px; height: 20px;" />
+    </button>
+  </view>
+</view>

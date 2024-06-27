@@ -1,0 +1,38 @@
+
+/* 轮播图容器样式 */
+.swiper-container {
+    width: 100%; /* 占满屏幕宽度 */
+    height: 50vh; /* 根据实际需要调整高度，这里设置为视窗高度的50% */
+}
+
+/* 功能按钮容器样式 */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: #8ab6f0; /* 蓝色背景 */
+}
+
+/* 按钮样式 */
+button {
+    background-color: #ffffff; /* 白色按钮 */
+    color: #000000; /* 黑色文字 */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 0; /* 增加垂直内边距以使按钮大小适中 */
+    margin: 8px 0; /* 按钮间的间隔 */
+    font-size: 12px;
+    text-align: center;
+    display: block; /* 确保按钮占据单独一行 */
+    width: 90%; /* 按钮宽度占满容器 */
+}
+
+/* 导航按钮悬浮效果样式 */
+.navigator-hover {
+    background-color: #e6f2ff; /* 按钮悬浮时较浅的蓝色背景 */
+}
+
+/* 应用于 <navigator> 组件的样式 */
+navigator {
+    width: 100%;
+}

@@ -1,0 +1,44 @@
+{
+    "pages": [
+        
+        "pages/Helper/Helper",
+        "pages/Home/Home",
+        "pages/Recommend/Recommend",
+        "pages/My/My",
+        "pages/light/index",
+        "pages/dark/index"
+        
+    ],
+    "window": {
+        "backgroundColor": "#F6F6F6",
+        "backgroundTextStyle": "light",
+        "navigationBarBackgroundColor": "#F6F6F6",
+        "navigationBarTitleText": "Alzheimer VisitaAID",
+        "navigationBarTextStyle": "black"
+    },
+     "tabBar": {
+        "list": [
+            {
+                "pagePath": "pages/Home/Home",
+                "text": "主页",
+                "iconPath": "images/home.png",
+                "selectedIconPath": "images/home.png"
+            },
+            {
+                "pagePath": "pages/Helper/Helper",
+                "text": "认知测试",
+                "iconPath": "images/testlogo.jpg",
+                "selectedIconPath": "images/testlogo.jpg"
+            },
+
+            {
+                "pagePath": "pages/My/My",
+                "text": "我的",
+                "iconPath": "images/my.png",
+                "selectedIconPath": "images/my.png"
+            }
+        ]
+    },
+    "style": "v2",
+    "sitemapLocation": "sitemap.json"
+}

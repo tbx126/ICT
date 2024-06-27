@@ -1,0 +1,36 @@
+<!--pages/My.wxml-->
+
+<view class="user-info">
+    <view class="head-image">
+
+    </view>
+    <view wx:if="{{hasUserInfo}}" class="user-detail">
+        <view class="user-nickname">昵称</view>
+        <view class="account">账户：</view>
+        <view class="balance">余额：</view>
+    </view>
+    <view wx:else class="please-login">请登录</view>
+</view>
+<view class="function-list">
+    <view class="line"></view>
+    <view class="power_item" bindtap="jumpPage" data-page="draft">
+        <view class="power_item_title">认知测试记录</view>
+        <image class="power_item_icon" src="../../images/arrow.svg"></image>
+    </view>
+    <view class="line"></view>
+    <view class="power_item" bindtap="jumpPage" data-page="service">
+        <view class="power_item_title">客服</view>
+        <image class="power_item_icon" src="../../images/arrow.svg"></image>
+    </view>
+    <view class="line"></view>
+    <view class="power_item" bindtap="jumpPage" data-page="help">
+        <view class="power_item_title">帮助</view>
+        <image class="power_item_icon" src="../../images/arrow.svg"></image>
+    </view>
+    <view class="line"></view>
+
+    <view class="line"></view>
+</view>
+
+<button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
+<button wx:else open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
