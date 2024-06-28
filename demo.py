@@ -25,12 +25,12 @@ system_prompt = str({
       "location": "Beijing",
   },
   "tasks": [
-    "First, Generate images for Classification Test",
+      "First, Clock Drawing Test(once)",
     "MOCA (Montreal Cognitive Assessment)",
     "ADAS-Cog (Alzheimer's Disease Assessment Scale-Cognitive Subscale)",
     "MMSE (Mini-Mental State Examination)",
-    "Clock Drawing Test",
-    "Classification Test with generated images"
+    "Clock Drawing Test(once)",
+    "Classification Test with generated images(once or twice)"
   ],
   "tips": [
     "Communicate solely in Chinese",
@@ -39,7 +39,6 @@ system_prompt = str({
     "Generate images for Classification Test",
     "Use accessible language for non-medical users",
     "Avoid mentioning specific model names or technologies",
-    "Do not require users to upload drawings",
     "Avoid tasks involving drawing lines to connect numbers or letters",
     "Start tests immediately without asking if users are ready",
     "Proceed with tasks without unnecessary pauses",
@@ -87,7 +86,7 @@ json_prompt = '''
 Your response have to follow this format:
     {
     "answer": "",
-    "has_image": true or false,
+    "need_generate_image": true or false,
     "image_description": "",
     }
     YOUR REPLY MUST BE DIRECTLY PARSABLE AS JSON!
@@ -101,7 +100,7 @@ conversations = {}
 def generate_image(prompt):
     try:
         response = client.images.generate(
-            model="dall-e-3",
+            model="dall-e-2",
             prompt=prompt,
             size="1024x1024",
             quality="standard",
@@ -121,6 +120,7 @@ def generate_image_async(cid, image_description):
     else:
         conversations[cid][-1]["image_status"] = "failed"
 
+
 def get_gpt_response(messages, cid, max_retries=5):
     for attempt in range(max_retries):
         try:
@@ -136,9 +136,10 @@ def get_gpt_response(messages, cid, max_retries=5):
             json_match = re.search(r'\{.*\}', result, re.DOTALL)
             if json_match:
                 result_dict = json.loads(json_match.group(0))
-                if result_dict.get("has_image", False):
+                if result_dict.get("need_generate_image", False):
                     result_dict["image_status"] = "generating"
-                    threading.Thread(target=generate_image_async, args=(cid, result_dict.get("image_description", ""))).start()
+                    threading.Thread(target=generate_image_async,
+                                     args=(cid, result_dict.get("image_description", ""))).start()
                 return result_dict
             print(f"No JSON found in response. Attempt {attempt + 1} of {max_retries}")
         except json.JSONDecodeError:
@@ -148,11 +149,14 @@ def get_gpt_response(messages, cid, max_retries=5):
     print("Failed to get JSON response after maximum retries.")
     raise Exception("Failed to get valid response")
 
+
 @app.route('/create', methods=['POST'])
 def create_conversation():
     data = request.json
-    prompt = data.get('prompt', '')
     cid = data.get('cid', '')
+    input_type = data.get('input_type', '')
+    input_content = data.get('input_content', '')
+
     print(data)
     print("Creating conversation")
 
@@ -166,12 +170,30 @@ def create_conversation():
             {"role": "assistant", "content": assistant_prompt}
         ]
 
-    conversations[cid].append({"role": "user", "content": prompt})
+    if input_type == 'text':
+        conversations[cid].append({"role": "user", "content": input_content})
+    elif input_type == 'image':
+        # 确保 input_content 是有效的 base64 字符串
+        if not input_content.startswith('data:image'):
+            input_content = f"data:image/jpeg;base64,{input_content}"
+
+        conversations[cid].append({
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "My drawing is uploaded, evaluate whether my image meet the need and continue the test."},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": input_content
+                    }
+                }
+            ]
+        })
 
     try:
         result_dict = get_gpt_response(conversations[cid], cid)
         answer = result_dict.get("answer", "")
-        has_image = result_dict.get("has_image", False)
+        need_generate_image = result_dict.get("need_generate_image", False)
         image_status = result_dict.get("image_status", "")
 
         conversations[cid].append({"role": "assistant", "content": json.dumps(result_dict)})
@@ -181,7 +203,7 @@ def create_conversation():
         return jsonify({
             'response': answer,
             'cid': cid,
-            'has_image': has_image,
+            'need_generate_image': need_generate_image,
             'image_status': image_status
         })
     except Exception as e:

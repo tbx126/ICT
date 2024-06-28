@@ -13,13 +13,14 @@
         </block>
         <block wx:elif="{{item.type === 'image'}}">
           <image 
-            id="img-{{index}}"
-            src="{{item.isSender ? imagePath : item.imgUrl}}" 
+            src="{{item.imgUrl}}" 
             mode="widthFix" 
             style="max-width: 200px; margin-top: 10px;" 
             binderror="onImageError" 
+            bindtap="previewImage"
+            data-src="{{item.imgUrl}}"
             data-index="{{index}}" 
-            data-retry-count="{{retryCount}}"
+            data-retry-count="{{item.retryCount || 0}}"
           />
         </block>
       </view>
