@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, send_file
 import re
-import logging
 import json
 import uuid
 import requests
@@ -13,17 +12,14 @@ app = Flask(__name__)
 api_key = "sk-B9aJzkfWO3xjl6FO53AeD7A6D9F64a7e971dB43111E4Cd69"
 base_url = "https://api.bltcy.ai/v1"
 
-# Log API key and URL for debugging (注意：生产环境不要打印API密钥)
-logging.debug(f'Using API key {api_key}')
-logging.debug(f'Using Base URL {base_url}')
+# Print API key and URL for debugging (注意：生产环境不要打印API密钥)
+print(f'Using API key {api_key}')
+print(f'Using Base URL {base_url}')
 
 client = OpenAI(
     api_key=api_key,
     base_url=base_url
 )
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
 
 # JSON string as system prompt
 system_prompt = '''
@@ -59,7 +55,7 @@ def generate_image(prompt):
         image_url = response.data[0].url
         return image_url
     except Exception as e:
-        logging.error(f'Error generating image: {e}')
+        print(f'Error generating image: {e}')
         return None
 
 
@@ -73,7 +69,6 @@ def get_gpt_response(messages, max_retries=5):
             )
             result = response.choices[0].message.content.strip()
             print("--------------------------------------------------------------")
-            print(result)
 
             # 使用正则表达式提取 JSON 字符串
             json_match = re.search(r'\{.*\}', result, re.DOTALL)
@@ -82,15 +77,15 @@ def get_gpt_response(messages, max_retries=5):
                 result_dict = json.loads(json_str)
                 return result_dict
             else:
-                logging.warning(f"No JSON found in response. Attempt {attempt + 1} of {max_retries}")
+                print(f"No JSON found in response. Attempt {attempt + 1} of {max_retries}")
 
         except json.JSONDecodeError:
-            logging.warning(f"Received non-JSON response. Attempt {attempt + 1} of {max_retries}")
+            print(f"Received non-JSON response. Attempt {attempt + 1} of {max_retries}")
 
         if attempt < max_retries - 1:
             messages.append({"role": "system", "content": assistant_prompt})
         else:
-            logging.error("Failed to get JSON response after maximum retries.")
+            print("Failed to get JSON response after maximum retries.")
             raise
 
 
@@ -110,10 +105,10 @@ def create_conversation():
     conversations[cid].append({"role": "user", "content": prompt})
 
     try:
-        logging.debug(f'Received prompt {prompt} for conversation {cid}')
+        print(f'Received prompt {prompt} for conversation {cid}')
         result_dict = get_gpt_response(conversations[cid])
 
-        logging.info(f"Complete GPT response: {json.dumps(result_dict, ensure_ascii=False, indent=2)}")
+        print(f"Complete GPT response: {json.dumps(result_dict, ensure_ascii=False, indent=2)}")
 
         answer = result_dict.get("answer", "")
         has_image = result_dict.get("has_image", False)
@@ -131,7 +126,7 @@ def create_conversation():
 
         return jsonify(response_data)
     except Exception as e:
-        logging.error(f'Error occurred {e}')
+        print(f'Error occurred {e}')
         return jsonify({'error': str(e)}), 500
 
 
@@ -148,7 +143,7 @@ def generate_image_endpoint():
         else:
             return jsonify({'error': 'Failed to generate image'}), 500
     except Exception as e:
-        logging.error(f'Error occurred {e}')
+        print(f'Error occurred {e}')
         return jsonify({'error': str(e)}), 500
 
 
@@ -161,7 +156,7 @@ def serve_image(image_url):
             mimetype='image/png'
         )
     except Exception as e:
-        logging.error(f'Error serving image: {e}')
+        print(f'Error serving image: {e}')
         return jsonify({'error': 'Failed to serve image'}), 500
 
 

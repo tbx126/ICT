@@ -52,7 +52,7 @@ Page({
         });
 
         wx.request({
-            url: 'http://localhost:7799/create',
+            url: 'http://192.168.1.8:7799/create',
             method: 'POST',
             data: { prompt: message, cid: this.data.cid },
             success: (res) => {
@@ -80,14 +80,14 @@ Page({
                             isWaitingImage: true
                         });
                         wx.request({
-                            url: 'http://localhost:7799/generate_image',
+                            url: 'http://192.168.1.8:7799/generate_image',
                             method: 'POST',
                             data: { image_description: res.data.image_description },
                             success: (imgRes) => {
                                 if (imgRes.statusCode === 200 && imgRes.data.image_url) {
                                     const imageMessage = {
                                         isSender: false,
-                                        imgUrl: `http://localhost:7799/image/${encodeURIComponent(imgRes.data.image_url)}`,
+                                        imgUrl: `http://192.168.1.8:7799/image/${encodeURIComponent(imgRes.data.image_url)}`,
                                         type: 'image'
                                     };
                                     this.setData({
