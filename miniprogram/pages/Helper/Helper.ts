@@ -52,7 +52,7 @@ Page({
         });
 
         wx.request({
-            url: 'http://192.168.1.8:7799/create',
+            url: 'https://d7d8-222-129-200-164.ngrok-free.app/create',
             method: 'POST',
             data: { prompt: message, cid: this.data.cid },
             success: (res) => {
@@ -75,51 +75,16 @@ Page({
                     });
 
                     // Add image message if there's an image
-                    if (res.data.has_image && res.data.image_description) {
+                    if (res.data.has_image && res.data.image_url) {
+                        const imageMessage = {
+                            isSender: false,
+                            imgUrl: res.data.image_url,
+                            type: 'image'
+                        };
                         this.setData({
-                            isWaitingImage: true
-                        });
-                        wx.request({
-                            url: 'http://192.168.1.8:7799/generate_image',
-                            method: 'POST',
-                            data: { image_description: res.data.image_description },
-                            success: (imgRes) => {
-                                if (imgRes.statusCode === 200 && imgRes.data.image_url) {
-                                    const imageMessage = {
-                                        isSender: false,
-                                        imgUrl: `http://192.168.1.8:7799/image/${encodeURIComponent(imgRes.data.image_url)}`,
-                                        type: 'image'
-                                    };
-                                    this.setData({
-                                        messages: this.data.messages.concat([imageMessage]),
-                                        isWaitingImage: false
-                                    }, () => {
-                                        this.scrollToBottom();
-                                    });
-                                } else {
-                                    const errorMessage = { isSender: false, message: '图片生成失败', type: 'text' };
-                                    this.setData({
-                                        messages: this.data.messages.concat([errorMessage]),
-                                        isWaitingImage: false
-                                    }, () => {
-                                        this.scrollToBottom();
-                                    });
-                                }
-                            },
-                            fail: (err) => {
-                                console.error('请求失败', err);
-                                wx.showToast({
-                                    title: '图片生成请求失败，请重试',
-                                    icon: 'none'
-                                });
-                                const errorMessage = { isSender: false, message: '图片生成请求失败，请重试', type: 'text' };
-                                this.setData({
-                                    messages: this.data.messages.concat([errorMessage]),
-                                    isWaitingImage: false
-                                }, () => {
-                                    this.scrollToBottom();
-                                });
-                            }
+                            messages: this.data.messages.concat([imageMessage]),
+                        }, () => {
+                            this.scrollToBottom();
                         });
                     }
                 } else {
