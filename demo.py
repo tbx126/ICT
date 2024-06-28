@@ -4,6 +4,7 @@ import json
 import uuid
 from datetime import date
 from openai import OpenAI
+import threading
 
 app = Flask(__name__)
 
@@ -24,6 +25,7 @@ system_prompt = str({
       "location": "Beijing",
   },
   "tasks": [
+    "First, Generate images for Classification Test",
     "MOCA (Montreal Cognitive Assessment)",
     "ADAS-Cog (Alzheimer's Disease Assessment Scale-Cognitive Subscale)",
     "MMSE (Mini-Mental State Examination)",
@@ -56,8 +58,6 @@ system_prompt = str({
     "Suggest lifestyle changes that may be beneficial",
   ]
 })
-
-print(str(date.today()))
 
 simple_system_prompt = '''
 {
@@ -113,7 +113,15 @@ def generate_image(prompt):
         print(f'Error generating image: {e}')
         return None
 
-def get_gpt_response(messages, max_retries=5):
+def generate_image_async(cid, image_description):
+    image_url = generate_image(image_description)
+    if image_url:
+        conversations[cid][-1]["image_url"] = image_url
+        conversations[cid][-1]["image_status"] = "ready"
+    else:
+        conversations[cid][-1]["image_status"] = "failed"
+
+def get_gpt_response(messages, cid, max_retries=5):
     for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
@@ -129,12 +137,8 @@ def get_gpt_response(messages, max_retries=5):
             if json_match:
                 result_dict = json.loads(json_match.group(0))
                 if result_dict.get("has_image", False):
-                    image_url = generate_image(result_dict.get("image_description", ""))
-                    if image_url:
-                        result_dict["image_url"] = image_url
-                    else:
-                        result_dict["has_image"] = False
-                        result_dict["answer"] += " (图片生成失败，请忽略图片相关内容)"
+                    result_dict["image_status"] = "generating"
+                    threading.Thread(target=generate_image_async, args=(cid, result_dict.get("image_description", ""))).start()
                 return result_dict
             print(f"No JSON found in response. Attempt {attempt + 1} of {max_retries}")
         except json.JSONDecodeError:
@@ -165,10 +169,10 @@ def create_conversation():
     conversations[cid].append({"role": "user", "content": prompt})
 
     try:
-        result_dict = get_gpt_response(conversations[cid])
+        result_dict = get_gpt_response(conversations[cid], cid)
         answer = result_dict.get("answer", "")
         has_image = result_dict.get("has_image", False)
-        image_url = result_dict.get("image_url", "")
+        image_status = result_dict.get("image_status", "")
 
         conversations[cid].append({"role": "assistant", "content": json.dumps(result_dict)})
         conversations[cid].append({"role": "system", "content": json_prompt})
@@ -178,11 +182,28 @@ def create_conversation():
             'response': answer,
             'cid': cid,
             'has_image': has_image,
-            'image_url': image_url
+            'image_status': image_status
         })
     except Exception as e:
         print(f'Error occurred: {e}')
         return jsonify({'error': str(e), 'cid': cid}), 500
+
+@app.route('/check_image', methods=['GET'])
+def check_image():
+    cid = request.args.get('cid')
+    if cid in conversations and conversations[cid][-1].get("image_status") == "ready":
+        return jsonify({
+            'image_url': conversations[cid][-1].get("image_url"),
+            'image_status': 'ready'
+        })
+    elif cid in conversations and conversations[cid][-1].get("image_status") == "failed":
+        return jsonify({
+            'image_status': 'failed'
+        })
+    else:
+        return jsonify({
+            'image_status': 'generating'
+        })
 
 if __name__ == '__main__':
     print("running")

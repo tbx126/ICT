@@ -12,7 +12,15 @@
           <text>{{item.message}}</text>
         </block>
         <block wx:elif="{{item.type === 'image'}}">
-          <image src="{{item.isSender ? imagePath : item.imgUrl}}" mode="widthFix" style="max-width: 200px; margin-top: 10px;" />
+          <image 
+            id="img-{{index}}"
+            src="{{item.isSender ? imagePath : item.imgUrl}}" 
+            mode="widthFix" 
+            style="max-width: 200px; margin-top: 10px;" 
+            binderror="onImageError" 
+            data-index="{{index}}" 
+            data-retry-count="{{retryCount}}"
+          />
         </block>
       </view>
     </block>
