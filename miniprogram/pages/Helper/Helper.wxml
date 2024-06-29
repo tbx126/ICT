@@ -7,25 +7,33 @@
     style="height: calc(100% - 60px);"
     bindscrolltolower="onScrollToLower"
   >
-    <block wx:for="{{messages}}" wx:key="index">
-      <view class="chat-bubble {{item.isSender ? 'sender' : 'receiver'}}" id="msg{{index}}">
-        <block wx:if="{{item.type === 'text'}}">
-          <text>{{item.message}}</text>
-        </block>
-        <block wx:elif="{{item.type === 'image'}}">
-          <image 
-            src="{{item.imgUrl}}" 
-            mode="widthFix" 
-            style="max-width: 200px; margin-top: 10px;" 
-            binderror="onImageError" 
-            bindtap="previewImage"
-            data-src="{{item.imgUrl}}"
-            data-index="{{index}}" 
-            data-retry-count="{{item.retryCount || 0}}"
-          />
-        </block>
-      </view>
-    </block>
+  <block wx:for="{{messages}}" wx:key="index">
+  <view class="chat-bubble {{item.isSender ? 'sender' : 'receiver'}}" id="msg{{index}}">
+    <view class="message-content">
+      <block wx:if="{{item.type === 'text'}}">
+        <text>{{item.message}}</text>
+      </block>
+      <block wx:if="{{item.type === 'image'}}">
+        <image 
+          src="{{item.imgUrl}}" 
+          mode="widthFix" 
+          style="max-width: 200px; margin-top: 10px;" 
+          binderror="onImageError" 
+          bindtap="previewImage"
+          data-src="{{item.imgUrl}}"
+          data-index="{{index}}" 
+          data-retry-count="{{item.retryCount || 0}}"
+        />
+      </block>
+      <block wx:if="{{item.type === 'audio'}}">
+        <view class="message-audio" bindtap="playAudioMessage" data-src="{{item.message}}">
+          <text class="audio-duration">{{item.duration}}s</text>
+          <image class="audio-icon" src="../../images/voice.png" mode="aspectFit" />
+        </view>
+      </block>
+    </view>
+  </view>
+</block>
     <view wx:if="{{isWaiting}}" class="chat-bubble receiver">
       <text class="waiting-dots">.....</text>
     </view>
@@ -33,18 +41,21 @@
       <image src="../../images/loading.gif" mode="widthFix" style="max-width: 50px; margin-top: 10px;" />
     </view>
     <view wx:if="{{isTyping}}" class="chat-bubble receiver">
-      <text>{{typingMessage}}</text>
+    <view class="message-content">
+        <text>{{typingMessage}}</text>
+    </view>
     </view>
     <view id="bottom" style="height: 1px;"></view>
   </scroll-view>
   
   <view class="input-container">
-    <input
-      class="input"
-      value="{{inputValue}}"
-      bindinput="onInput"
-      placeholder="输入消息内容"
-    />
+    <button class="audio-btn" bindtap="toggleInputMode">🎤</button>
+    <block wx:if="{{isRecording}}">
+      <button class="record-btn" bindtouchstart="startRecording" bindtouchend="stopRecording">按住说话</button>
+    </block>
+    <block wx:else>
+      <input class="input" value="{{inputValue}}" placeholder="输入消息内容" bindinput="onInput" />
+    </block>
     <button class="send-btn" bindtap="onSend">
       <image src="../../images/send.png" style="width: 20px; height: 20px;" />
     </button>

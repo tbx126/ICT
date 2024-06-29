@@ -3,9 +3,9 @@
     flex-direction: column;
     height: 100%;
     width: 100%;
-}
-
-.chat-container {
+  }
+  
+  .chat-container {
     flex: 1;
     background-color: #8ab6f0;
     overflow-y: scroll;
@@ -15,15 +15,15 @@
     left: 0;
     right: 0;
     bottom: 60px;
-}
-
-.chat-container::after {
+  }
+  
+  .chat-container::after {
     content: "";
     display: table;
     clear: both;
-}
-
-.chat-bubble {
+  }
+  
+  .chat-bubble {
     display: inline-block;
     margin: 10px;
     padding: 8px 12px;
@@ -32,34 +32,34 @@
     position: relative;
     word-wrap: break-word;
     box-sizing: border-box;
-    max-width: 80%; /* 限制气泡最大宽度 */
-}
-
-.sender {
+    max-width: 80%;
+  }
+  
+  .sender {
     float: right;
     background-color: #1c7eff;
     color: #ffffff;
-}
-
-.receiver {
+  }
+  
+  .receiver {
     float: left;
     background-color: #f1f1f1;
     color: #333333;
-}
-
-.input-container {
+  }
+  
+  .input-container {
     display: flex;
     align-items: center;
     padding: 0 10px;
     background-color: #ffffff;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid #8ab6f0;
     position: fixed;
     bottom: 0;
     width: 100%;
     height: 60px;
-}
-
-.input {
+  }
+  
+  .input {
     flex: 2;
     height: 40px;
     padding: 0 10px;
@@ -67,9 +67,9 @@
     border-radius: 20px;
     background-color: #f5f5f5;
     font-size: 14px;
-}
-
-.send-btn {
+  }
+  
+  .send-btn {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -83,35 +83,102 @@
     font-size: 14px;
     height: 40px;
     line-height: 20px;
-}
-
-.receiver towxml {
+  }
+  
+  .receiver towxml {
     font-size: 14px;
     line-height: 1.3;
-}
-
-.receiver towxml .h2w__p {
+  }
+  
+  .receiver towxml .h2w__p {
     margin-top: 0.3em;
     margin-bottom: 0.3em;
-}
-
-@keyframes blink {
+  }
+  
+  @keyframes blink {
     0% { opacity: 0.2; }
     20% { opacity: 1; }
     100% { opacity: 0.2; }
-}
-
-.waiting-dots {
+  }
+  
+  .waiting-dots {
     animation: blink 1.4s infinite both;
-}
-
-/* 新增样式 */
-.chat-bubble.receiver .waiting-dots {
+  }
+  
+  .chat-bubble.receiver .waiting-dots {
     font-size: 20px;
     letter-spacing: 3px;
-}
-
-.chat-bubble.receiver image {
+  }
+  
+  .chat-bubble.receiver image {
     max-width: 100%;
     height: auto;
-}
+  }
+  
+  .audio-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0.2;
+    margin-right: 10px;
+    background-color: #8ab6f0;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 20px;
+    font-size: 20px;
+    height: 40px;
+    line-height: 20px;
+  }
+  
+  .record-btn {
+    flex: 2;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    background-color: #f5f5f5;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000000;
+  }
+  
+  .message-audio {
+    min-width: 80px;
+    height: 40px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: #1c7eff;
+    border-radius: 20px;
+    padding: 0 10px;
+    cursor: pointer;
+  }
+  
+  .sender .message-audio {
+    background-color: #1c7eff;
+  }
+  
+  .receiver .message-audio {
+    background-color: #f1f1f1;
+    flex-direction: row-reverse;
+  }
+  
+  .audio-duration {
+    color: #ffffff;
+    font-size: 14px;
+    margin-right: 10px;
+  }
+  
+  .receiver .audio-duration {
+    color: #333333;
+    margin-right: 0;
+    margin-left: 10px;
+  }
+  
+  .audio-icon {
+    width: 20px;
+    height: 20px;
+  }
+  

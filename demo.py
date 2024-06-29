@@ -4,8 +4,8 @@ import json
 import uuid
 from datetime import date
 from openai import OpenAI
-import threading
 import base64
+import threading
 import io
 
 app = Flask(__name__)
@@ -27,7 +27,6 @@ system_prompt = str({
         "location": "Beijing",
     },
     "tasks": [
-        "First, Generate images for Classification Test",
         "MOCA (Montreal Cognitive Assessment)",
         "ADAS-Cog (Alzheimer's Disease Assessment Scale-Cognitive Subscale)",
         "MMSE (Mini-Mental State Examination)",
@@ -35,21 +34,21 @@ system_prompt = str({
         "Classification Test with generated images(once or twice)"
     ],
     "tips": [
-        "Communicate solely in Chinese",
         "Explain and introduce each test section briefly",
         "Ask questions one at a time",
-        "Generate images for Classification Test",
+        "Tell the user that they need to identify objects in images for the classification test.",
+        "Tell user the time they need to draw in Clock Drawing Test."
         "Use accessible language for non-medical users",
         "Avoid mentioning specific model names or technologies",
-        "Avoid tasks involving drawing lines to connect numbers or letters",
+        "Avoid tasks need drawing lines to connect numbers or letters",
         "Start tests immediately without asking if users are ready",
         "Proceed with tasks without unnecessary pauses",
         "Adapt questions if user shows difficulty understanding",
-        "Provide clear instructions for each task",
+        "Provide clear instructions for each task.",
         "Offer encouragement throughout the assessment",
-        "Present the report directly at the end, instead of making users wait for the report to be generated."
+        "Present the report directly at the same message, instead of making users wait for the report to be generated."
     ],
-    "report": [
+    "essentialContentInReport": [
         "Analyze user's performance in all tests",
         "Offer preliminary suggestions based on performance",
         "Estimate likelihood of Alzheimer's disease",
@@ -59,30 +58,6 @@ system_prompt = str({
         "Suggest lifestyle changes that may be beneficial",
     ]
 })
-
-simple_system_prompt = '''
-{
-  "role": "AlzheimerVisitaAID helper",
-  "language": "Chinese",
-  "tips": [
-    "Use accessible language for non-medical users",
-    "Start tests immediately without asking if users are ready",
-    "Proceed with tasks without unnecessary pauses",
-    "Adapt questions if user shows difficulty understanding",
-    "Provide clear instructions for each task",
-    "Offer encouragement throughout the assessment"
-  ],
-  "report": [
-    "Analyze user's performance in all tests",
-    "Offer preliminary suggestions based on performance",
-    "Estimate likelihood of Alzheimer's disease",
-    "Emphasize need for professional medical advice",
-    "Provide guidance on subsequent steps",
-    "Present results in easy-to-understand format",
-    "Suggest lifestyle changes that may be beneficial",
-  ]
-}
-'''
 
 json_prompt = '''
 Your response have to follow this format:
@@ -99,7 +74,6 @@ assistant_prompt = "你好!欢迎使用 AlzheimerVisitaAid 测试。这个测试
 
 conversations = {}
 
-
 def generate_image(prompt):
     try:
         response = client.images.generate(
@@ -115,7 +89,6 @@ def generate_image(prompt):
         print(f'Error generating image: {e}')
         return None
 
-
 def generate_image_async(cid, image_description):
     image_url = generate_image(image_description)
     if image_url:
@@ -123,7 +96,6 @@ def generate_image_async(cid, image_description):
         conversations[cid][-1]["image_status"] = "ready"
     else:
         conversations[cid][-1]["image_status"] = "failed"
-
 
 def generate_audio(text):
     try:
@@ -145,6 +117,24 @@ def generate_audio(text):
         print(f'Error generating audio: {e}')
         return None
 
+def transcribe_audio(audio_base64):
+    try:
+        # 解码Base64数据
+        audio_data = base64.b64decode(audio_base64)
+
+        # 创建一个内存中的文件对象
+        audio_file = io.BytesIO(audio_data)
+
+        # 调用API进行转录
+        response = client.audio.transcriptions.create(
+            model="whisper-1",
+            file=("audio.mp3", audio_file, "audio/mpeg")
+        )
+
+        return response.text
+    except Exception as e:
+        print(f'Error transcribing audio: {e}')
+        return None
 
 def get_gpt_response(messages, cid, max_retries=5):
     for attempt in range(max_retries):
@@ -154,7 +144,6 @@ def get_gpt_response(messages, cid, max_retries=5):
                 messages=messages,
                 max_tokens=4096
             )
-            print(response)
             result = response.choices[0].message.content.strip()
             print("---------------------------------------------------------------")
             print(result)
@@ -179,16 +168,12 @@ def get_gpt_response(messages, cid, max_retries=5):
     print("Failed to get JSON response after maximum retries.")
     raise Exception("Failed to get valid response")
 
-
 @app.route('/create', methods=['POST'])
 def create_conversation():
     data = request.json
     cid = data.get('cid', '')
     input_type = data.get('input_type', '')
     input_content = data.get('input_content', '')
-
-    print(data)
-    print("Creating conversation")
 
     if not cid:
         cid = str(uuid.uuid4())
@@ -200,11 +185,11 @@ def create_conversation():
             {"role": "assistant", "content": assistant_prompt}
         ]
 
-    print(conversations[cid])
-
     if input_type == 'text':
+        print("[TEXT] User: " + data["input_content"])
         conversations[cid].append({"role": "user", "content": input_content})
     elif input_type == 'image':
+        print("[IMAGE] User uploaded a image.")
         # 确保 input_content 是有效的 base64 字符串
         if not input_content.startswith('data:image'):
             input_content = f"data:image/jpeg;base64,{input_content}"
@@ -222,6 +207,14 @@ def create_conversation():
                 }
             ]
         })
+    elif input_type == 'audio':
+        # 将音频转换成文本
+        transcribed_text = transcribe_audio(input_content)
+        print("[AUDIO] User: " + transcribed_text)
+        if transcribed_text:
+            conversations[cid].append({"role": "user", "content": transcribed_text})
+        else:
+            return jsonify({'error': 'Failed to transcribe audio', 'cid': cid}), 500
 
     try:
         result_dict = get_gpt_response(conversations[cid], cid)
@@ -236,7 +229,6 @@ def create_conversation():
         # 将不包含 audio_base64 的响应添加到对话历史
         conversations[cid].append({"role": "assistant", "content": json.dumps(history_dict)})
         conversations[cid].append({"role": "system", "content": json_prompt})
-        conversations[cid].append({"role": "system", "content": simple_system_prompt})
 
         return jsonify({
             'response': answer,
@@ -248,7 +240,6 @@ def create_conversation():
     except Exception as e:
         print(f'Error occurred: {e}')
         return jsonify({'error': str(e), 'cid': cid}), 500
-
 
 @app.route('/check_image', methods=['GET'])
 def check_image():
@@ -266,7 +257,6 @@ def check_image():
         return jsonify({
             'image_status': 'generating'
         })
-
 
 if __name__ == '__main__':
     print("running")
