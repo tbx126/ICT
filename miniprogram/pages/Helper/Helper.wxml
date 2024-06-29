@@ -5,6 +5,7 @@
     scroll-into-view="{{scrollToView}}"
     scroll-with-animation
     style="height: calc(100% - 60px);"
+    bindscrolltolower="onScrollToLower"
   >
     <block wx:for="{{messages}}" wx:key="index">
       <view class="chat-bubble {{item.isSender ? 'sender' : 'receiver'}}" id="msg{{index}}">
@@ -31,7 +32,10 @@
     <view wx:if="{{isWaitingImage}}" class="chat-bubble receiver">
       <image src="../../images/loading.gif" mode="widthFix" style="max-width: 50px; margin-top: 10px;" />
     </view>
-    <view id="bottom"></view>
+    <view wx:if="{{isTyping}}" class="chat-bubble receiver">
+      <text>{{typingMessage}}</text>
+    </view>
+    <view id="bottom" style="height: 1px;"></view>
   </scroll-view>
   
   <view class="input-container">

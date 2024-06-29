@@ -25,7 +25,7 @@ system_prompt = str({
       "location": "Beijing",
   },
   "tasks": [
-      "First, Clock Drawing Test(once)",
+    "First, Generate images for Classification Test",
     "MOCA (Montreal Cognitive Assessment)",
     "ADAS-Cog (Alzheimer's Disease Assessment Scale-Cognitive Subscale)",
     "MMSE (Mini-Mental State Examination)",
@@ -100,7 +100,7 @@ conversations = {}
 def generate_image(prompt):
     try:
         response = client.images.generate(
-            model="dall-e-2",
+            model="dall-e-3",
             prompt=prompt,
             size="1024x1024",
             quality="standard",
