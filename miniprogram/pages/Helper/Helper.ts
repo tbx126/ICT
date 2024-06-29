@@ -19,6 +19,8 @@ interface PageData {
   typingMessage: string;
   isTyping: boolean;
   tempImagePath?: string;
+  audioContext: WechatMiniprogram.InnerAudioContext | null;
+  isAudioPlaying: boolean;
 }
 
 Page<PageData>({
@@ -31,13 +33,18 @@ Page<PageData>({
     cid: '',
     isWaiting: false,
     isWaitingImage: false,
+    isAudioPlaying: false,
     retryCount: 0,
     typingMessage: '',
     isTyping: false,
+    audioContext: null as WechatMiniprogram.InnerAudioContext | null,
   },
 
   onLoad: function() {
     this.scrollToBottom();
+    this.setData({
+      audioContext: wx.createInnerAudioContext()
+    });
   },
 
   onInput(e: WechatMiniprogram.Input) {
@@ -103,6 +110,12 @@ Page<PageData>({
             cid: res.data.cid,
             isWaiting: false
           });
+          
+          // Play audio
+          if (res.data.audio_base64) {
+            this.playAudio(res.data.audio_base64);
+          }
+          
           this.typeMessage(res.data.response);
 
           if (res.data.need_generate_image && res.data.image_status === 'generating') {
@@ -139,6 +152,38 @@ Page<PageData>({
     });
   },
 
+  playAudio(audioBase64: string) {
+    console.log('Received audio base64:', audioBase64);
+    const audioSrc = `data:audio/mp3;base64,${audioBase64}`;
+    if (this.data.audioContext) {
+      this.data.audioContext.src = audioSrc;
+      
+      this.data.audioContext.onError((res) => {
+        console.error('Audio play error:', res.errMsg);
+        this.setData({ isAudioPlaying: false });
+      });
+  
+      this.data.audioContext.onCanplay(() => {
+        console.log('Audio is ready to play');
+        this.data.audioContext?.play();
+      });
+  
+      this.data.audioContext.onPlay(() => {
+        console.log('Audio started playing');
+        this.setData({ isAudioPlaying: true });
+      });
+  
+      this.data.audioContext.onEnded(() => {
+        console.log('Audio finished playing');
+        this.setData({ isAudioPlaying: false });
+      });
+  
+    } else {
+      console.error('audioContext is not initialized');
+    }
+  },
+  
+
   typeMessage(message: string, index: number = 0) {
     if (index < message.length) {
       this.setData({
@@ -160,8 +205,16 @@ Page<PageData>({
       }, () => {
         this.scrollToBottom();
       });
+  
+      // 检查音频是否仍在播放
+      if (!this.data.isAudioPlaying) {
+        // 如果音频已经停止，则停止音频上下文
+        if (this.data.audioContext) {
+          this.data.audioContext.stop();
+        }
+      }
     }
-  },
+  },  
 
   pollForImage(retries: number = 30, interval: number = 2000) {
     let count = 0;
