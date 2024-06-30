@@ -1,14 +1,14 @@
 <view class="container wrap">
     <!-- Added image view for logo -->
     <view class="logo">
-        <image src="../../images/nobglogo.png" mode="aspectFit"></image>
+        <image src="../../images/logo_trans.png" mode="aspectFit"></image>
     </view>
     <view class="menu" bindtap="actionSheetChange"> </view>
-    <text font-size="14px;">{{userInfo.nickName}}</text> Alzheimer VisitaAID
+    <text font-size="18px;">{{userInfo.nickName}}</text> 元神智辅
     <view class="textBox"><text>家庭认知端</text></view>
     <view class="btnBox">
         <!-- Adjusted button style with class "whiteOnBlue" -->
-        <button bindtap="chatWithMe" class="whiteOnBlue" size="mini">前往体验</button>
+        <button bindtap="chatWithMe" class="whiteOnBlue" size="medium">前往体验</button>
     </view>
     <action-sheet hidden="{{actionSheetHidden}}" bindchange="actionSheetChange">
         <block wx:key="1" wx:for="{{actionSheetItems}}">

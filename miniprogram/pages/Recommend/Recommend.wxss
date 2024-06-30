@@ -39,7 +39,7 @@
 /* Adjusted button style to have white text on a blue background */
 .whiteOnBlue {
     color: #FFFFFF;
-    background-color: #1c7eff;
+    background-color: #47c0fd;
     border-color: #1c7eff;
 }
 

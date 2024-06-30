@@ -11,20 +11,24 @@
     flex-direction: column;
     padding: 15px;
     background-color: #8ab6f0; /* 蓝色背景 */
+    height: 40vh;
+    justify-content: space-around;
+    align-items: center;
 }
 
 /* 按钮样式 */
 button {
     background-color: #ffffff; /* 白色按钮 */
-    color: #000000; /* 黑色文字 */
+    color: #000000d0; /* 黑色文字 */
     border: none;
     border-radius: 5px;
-    padding: 10px 0; /* 增加垂直内边距以使按钮大小适中 */
-    margin: 8px 0; /* 按钮间的间隔 */
-    font-size: 12px;
+    font-size: 16px;
     text-align: center;
-    display: block; /* 确保按钮占据单独一行 */
-    width: 90%; /* 按钮宽度占满容器 */
+    padding: auto;
+    top:8%;
+    width: 100%; /* 按钮宽度占满容器 */
+    height: 75%;
+    line-height: 180%;/*文字没有实现垂直居中*/
 }
 
 /* 导航按钮悬浮效果样式 */
@@ -35,4 +39,10 @@ button {
 /* 应用于 <navigator> 组件的样式 */
 navigator {
     width: 100%;
+}
+
+.swiper-image {
+    width: 100%;
+    height: 95%;
+    top:0
 }

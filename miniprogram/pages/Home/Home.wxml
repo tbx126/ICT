@@ -1,28 +1,28 @@
-<swiper class="swiper-container" indicator-dots indicator-color="white" indicator-active-color="black" autoplay circular="3000">
+<swiper class="swiper-container" indicator-dots indicator-color="#765bda" indicator-active-color="#3d70cd" autoplay circular="3000">
     <!-- 轮播图项 -->
     <swiper-item>
-       <image src="../../images/1.png" mode="aspectFit"/>
+       <image src="../../images/1.jpg" mode="aspectFit" class="swiper-image"/>
     </swiper-item>
     <swiper-item>
-        <image src="../../images/2.png" mode="aspectFit"/>
+        <image src="../../images/2.png" mode="aspectFit" class="swiper-image"/>
     </swiper-item>
     <swiper-item>
-        <image src="../../images/3.png" mode="aspectFit"/>
+        <image src="../../images/3.jpg" mode="aspectFit" class="swiper-image"/>
     </swiper-item>
 </swiper>
 
 <view class="button-container">
     <!-- 功能按钮 -->
-    <navigator url="/pages/awareness/awareness" hover-class="navigator-hover">
+    <navigator url="/pages/awareness/awareness" hover-class="navigator-hover" style="flex: 1;">
         <button>阿尔兹海默症科普</button>
     </navigator>
-    <navigator url="/pages/care_tips/care_tips" hover-class="navigator-hover">
+    <navigator url="/pages/care_tips/care_tips" hover-class="navigator-hover" style="flex: 1;">
         <button>护理建议</button>
     </navigator>
-    <navigator url="/pages/support_group/support_group" hover-class="navigator-hover">
+    <navigator url="/pages/support_group/support_group" hover-class="navigator-hover" style="flex: 1;">
         <button>患者家属互助圈</button>
     </navigator>
-    <navigator url="/pages/research/research" hover-class="navigator-hover">
+    <navigator url="/pages/research/research" hover-class="navigator-hover" style="flex: 1;">
         <button>最新研究与进展</button>
     </navigator>
 </view>
